@@ -1,12 +1,11 @@
 //
 //  main.cpp
-//  ShadersUniform
+//  ShadersExcercise1
 //
-//  Created by Sasidharan Mahalingam on 3/2/23.
+//  Created by Sasidharan Mahalingam on 3/3/23.
 //
 
 #include <iostream>
-#include <cmath>
 #include "glad.h"
 #include <GLFW/glfw3.h>
 
@@ -24,7 +23,6 @@ void processInput(GLFWwindow *window)
         glfwSetWindowShouldClose(window, true);
     }
 }
-
 
 int main(int argc, const char * argv[]) {
     // set up GLFW
@@ -54,21 +52,25 @@ int main(int argc, const char * argv[]) {
     }
     
     // define the vertex shader
-    const char *vertexShaderSource ="#version 330 core\n"
+    const char *vertexShaderSource = "#version 330 core\n"
         "layout (location = 0) in vec3 aPos;\n"
+        "layout (location = 1) in vec3 aColor;\n"
+        "out vec3 ourColor;\n"
         "void main()\n"
         "{\n"
-        "   gl_Position = vec4(aPos, 1.0);\n"
-        "}\0";
+        "   gl_Position = vec4(aPos.x, -aPos.y, aPos.z, 1.0);\n"
+        "   ourColor = aColor;\n"
+        "}\n\0";
     
-    // define the fragment shader
+    //define the fragment shader
     const char *fragmentShaderSource = "#version 330 core\n"
         "out vec4 FragColor;\n"
-        "uniform vec4 ourColor;\n"
+        "in vec3 ourColor;\n"
         "void main()\n"
         "{\n"
-        "   FragColor = ourColor;\n"
+        "   FragColor = vec4(ourColor, 1.0f);\n"
         "}\n\0";
+    
     // compile vertex shaders
     unsigned int vertexShader;
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -111,13 +113,14 @@ int main(int argc, const char * argv[]) {
         std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
     
-    // define the triangle vertices
+    // set the vertices and color
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-         0.0f,  0.5f, 0.0f
+        // positions         // colors
+         0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
+         0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // top
     };
-    
+        
     // defining a VBO and binding it to a VAO
     unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
@@ -128,10 +131,21 @@ int main(int argc, const char * argv[]) {
     //copy data into the bound VBO
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
     
+    //unbind VBO
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    
+    //unbind VAO
     glBindVertexArray(0);
+    
+    // run the shader program
+    glUseProgram(shaderProgram);
     
     // start render loop
     while(!glfwWindowShouldClose(window))
@@ -143,20 +157,7 @@ int main(int argc, const char * argv[]) {
         // clear color buffer
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        // run the shader program
-        glUseProgram(shaderProgram);
-        // update shader uniform
-        double  timeValue = glfwGetTime();
-        float greenValue = static_cast<float>(sin(timeValue) / 2.0 + 0.5);
-        int uniformColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        if(uniformColorLocation < 0)
-        {
-            std::cout << "ERROR::SHADER::PROGRAM::UNABLE_TO_GET_UNIFORM_VARIABLE\n" << std::endl;
-            return -1;
-        }
-        glUniform4f(uniformColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         
-        // render the triangle
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         
@@ -164,6 +165,7 @@ int main(int argc, const char * argv[]) {
         glfwPollEvents();
         glfwSwapBuffers(window);
     }
+    
     // deallocate all resources
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
@@ -177,5 +179,4 @@ int main(int argc, const char * argv[]) {
     glfwTerminate();
     
     return 0;
-    
 }
