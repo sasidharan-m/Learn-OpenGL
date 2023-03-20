@@ -56,7 +56,7 @@ int main(int argc, const char * argv[]) {
     // Getting homepath
     std::string homepath = getenv("HOME");
     // Setting current path
-    std::string currentpath = "/Documents/OpenGL/Learn OpenGL/OpenGL-Programs/Part-1 Getting Started/Practice Programs/TexturesExcercise3/TexturesExcercise3/";
+    std::string currentpath = "/Documents/OpenGL/OpenGL-Programs/Part-1 Getting Started/Practice Programs/TexturesExcercise3/TexturesExcercise3/";
     // Setting the paths of vertex and fragment shaders
     std::string vsPath = homepath + currentpath + "src/textures.vs";
     std::string fsPath = homepath + currentpath + "src/textures.fs";
