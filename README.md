@@ -1,4 +1,4 @@
-# OpenGL-Programs
+# Learn OpenGL-Programs
 This repository contains the programming solutions for the book "Learn OpenGL - Graphics Programming". All solutions have been developed on XCode on Mac OS.
 
 Instructions to use the programs on Mac OS:
