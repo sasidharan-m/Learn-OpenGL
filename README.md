@@ -1,6 +1,6 @@
 # OpenGL Example Programs
 
-This repository contains a collection of OpenGL example programs built using CMake. These examples are designed to help you get started with OpenGL and understand modern rendering techniques using GLFW and GLAD.
+This repository contains a collection of OpenGL example programs and problem solutions for this book (https://learnopengl.com). This project is built using CMake. These examples are designed to help you get started with OpenGL and understand modern rendering techniques using GLFW and GLAD.
 
 ## 📁 Structure
 
