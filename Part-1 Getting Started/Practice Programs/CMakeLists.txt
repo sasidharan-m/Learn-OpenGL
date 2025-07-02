@@ -1,0 +1,17 @@
+cmake_minimum_required(VERSION 3.10)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_subdirectory("2.3 HelloTriangleExcercise1")
+add_subdirectory("2.4 HelloTriangleExcercise2")
+add_subdirectory("2.5 HelloTriangleExcercise3")
+add_subdirectory("3.3 ShadersExcercise1")
+add_subdirectory("3.4 ShadersExcercise2")
+add_subdirectory("3.5 ShadersExcercise3")
+add_subdirectory("4.3 TexturesExcercise1")
+add_subdirectory("4.4 TexturesExcercise2")
+add_subdirectory("4.5 TexturesExcercise3")
+add_subdirectory("4.6 TexturesExcercise4")
+add_subdirectory("5.2 TransformationsExcercise1")
+add_subdirectory("5.3 TransformationsExcercise2")
