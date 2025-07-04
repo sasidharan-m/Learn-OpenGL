@@ -56,7 +56,7 @@ int main(int argc, const char * argv[]) {
     // Getting homepath
     std::string homepath = getenv("HOME");
     // Setting current path
-    std::string currentpath = "/Documents/OpenGL/OpenGL-Programs-CMake/Part-1 Getting Started/Example Programs/Textures/";
+    std::string currentpath = "/Documents/OpenGL/OpenGL-Programs/Part-1 Getting Started/Example Programs/4.1 Textures/";
     // Setting the paths of vertex and fragment shaders
     std::string vsPath = homepath + currentpath + "textures.vs";
     std::string fsPath = homepath + currentpath + "textures.fs";
@@ -113,7 +113,7 @@ int main(int argc, const char * argv[]) {
     // load image, create texture and generate mipmaps
     int width, height, nrChannels;
     // Set the right img path
-    std::string texturePath = homepath + "/Documents/OpenGL/OpenGL-Programs-CMake/" + "resources/container.jpg";
+    std::string texturePath = homepath + "/Documents/OpenGL/OpenGL-Programs/" + "resources/container.jpg";
     unsigned char *data = stbi_load(texturePath.c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {

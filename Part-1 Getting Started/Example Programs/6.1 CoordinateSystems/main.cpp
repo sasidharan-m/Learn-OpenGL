@@ -1,8 +1,8 @@
 //
 //  main.cpp
-//  Transformations
+//  CoordinateSystems
 //
-//  Created by  Sasidharan Mahalingam on 20/03/23.
+//  Created by  Sasidharan Mahalingam on 02/07/25.
 //
 
 #include <iostream>
@@ -60,7 +60,7 @@ int main(int argc, const char * argv[]) {
     // Getting homepath
     std::string homepath = getenv("HOME");
     // Setting current path
-    std::string currentpath = "/Documents/OpenGL/OpenGL-Programs/Part-1 Getting Started/Example Programs/5.1 Transformations/";
+    std::string currentpath = "/Documents/OpenGL/OpenGL-Programs/Part-1 Getting Started/Example Programs/6.1 CoordinateSystems/";
     // Setting the paths of vertex and fragment shaders
     std::string vsPath = homepath + currentpath + "textures.vs";
     std::string fsPath = homepath + currentpath + "textures.fs";
@@ -178,14 +178,24 @@ int main(int argc, const char * argv[]) {
         glBindTexture(GL_TEXTURE_2D, texture2);
         
         // create transformations
-        glm::mat4 transform = glm::mat4(1.0f);
-        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
-        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f,1.0f));
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 projection = glm::mat4(1.0f);
+        
+        model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
         // render container
         ourShader.use();
-        unsigned int transformLoc = glGetUniformLocation(ourShader.getProgramID(), "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+        unsigned int modelLoc = glGetUniformLocation(ourShader.getProgramID(), "model");
+        unsigned int viewLoc = glGetUniformLocation(ourShader.getProgramID(), "view");
+        unsigned int projectionLoc = glGetUniformLocation(ourShader.getProgramID(), "projection");
+
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         

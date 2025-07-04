@@ -1,8 +1,8 @@
 //
 //  main.cpp
-//  Transformations
+//  CoordinateSystems
 //
-//  Created by  Sasidharan Mahalingam on 20/03/23.
+//  Created by  Sasidharan Mahalingam on 03/07/25.
 //
 
 #include <iostream>
@@ -57,10 +57,14 @@ int main(int argc, const char * argv[]) {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+    // Enable depth testing
+    glEnable(GL_DEPTH_TEST);
+
     // Getting homepath
     std::string homepath = getenv("HOME");
     // Setting current path
-    std::string currentpath = "/Documents/OpenGL/OpenGL-Programs/Part-1 Getting Started/Example Programs/5.1 Transformations/";
+    std::string currentpath = "/Documents/OpenGL/OpenGL-Programs/Part-1 Getting Started/Example Programs/6.2 CoordinateSystemsDepth/";
     // Setting the paths of vertex and fragment shaders
     std::string vsPath = homepath + currentpath + "textures.vs";
     std::string fsPath = homepath + currentpath + "textures.fs";
@@ -68,17 +72,84 @@ int main(int argc, const char * argv[]) {
     Shader ourShader(vsPath.c_str(), fsPath.c_str());
     
     // set the vertices, color and texture
-    float vertices[] = {
+   float vertices[] = {
         // positions          // texture coords
-         0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // top right
-         0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // bottom left
-        -0.5f,  0.5f, 0.0f,   0.0f, 1.0f  // top left
+
+        // Back face
+        -0.5f, -0.5f, -0.5f,   0.0f, 0.0f,  // Bottom-left
+        0.5f, -0.5f, -0.5f,   1.0f, 0.0f,  // Bottom-right
+        0.5f,  0.5f, -0.5f,   1.0f, 1.0f,  // Top-right
+        -0.5f,  0.5f, -0.5f,   0.0f, 1.0f,  // Top-left
+
+        // Front face
+        -0.5f, -0.5f,  0.5f,   0.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,   1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,   1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,   0.0f, 1.0f,
+
+        // Left face
+        -0.5f, -0.5f, -0.5f,   0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,   1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,   1.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,   0.0f, 1.0f,
+
+        // Right face
+        0.5f, -0.5f, -0.5f,   0.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,   1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,   1.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,   0.0f, 1.0f,
+
+        // Bottom face
+        -0.5f, -0.5f, -0.5f,   0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,   1.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,   1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,   0.0f, 1.0f,
+
+        // Top face
+        -0.5f,  0.5f, -0.5f,   0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,   1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,   1.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,   0.0f, 1.0f
     };
     
     unsigned int indices[] = {
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
+        // Back face
+        0, 1, 2,
+        2, 3, 0,
+
+        // Front face
+        4, 5, 6,
+        6, 7, 4,
+
+        // Left face
+        8, 9,10,
+        10,11, 8,
+
+        // Right face
+        12,13,14,
+        14,15,12,
+
+        // Bottom face
+        16,17,18,
+        18,19,16,
+
+        // Top face
+        20,21,22,
+        22,23,20
+    };
+
+    // define the translations for the different cubes
+    glm::vec3 cubePositions[] = {
+        glm::vec3( 0.0f, 0.0f, 0.0f),
+        glm::vec3( 2.0f, 5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3( 2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f, 3.0f, -7.5f),
+        glm::vec3( 1.3f, -2.0f, -2.5f),
+        glm::vec3( 1.5f, 2.0f, -2.5f),
+        glm::vec3( 1.5f, 0.2f, -1.5f),
+        glm::vec3(-1.3f, 1.0f, -1.5f)
     };
         
     unsigned int VBO, VAO, EBO;
@@ -169,7 +240,7 @@ int main(int argc, const char * argv[]) {
         
         // clear color buffer
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         // bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
@@ -178,16 +249,26 @@ int main(int argc, const char * argv[]) {
         glBindTexture(GL_TEXTURE_2D, texture2);
         
         // create transformations
-        glm::mat4 transform = glm::mat4(1.0f);
-        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
-        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f,1.0f));
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 projection = glm::mat4(1.0f);
+        
+        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
         // render container
         ourShader.use();
-        unsigned int transformLoc = glGetUniformLocation(ourShader.getProgramID(), "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+        unsigned int modelLoc = glGetUniformLocation(ourShader.getProgramID(), "model");
+        unsigned int viewLoc = glGetUniformLocation(ourShader.getProgramID(), "view");
+        unsigned int projectionLoc = glGetUniformLocation(ourShader.getProgramID(), "projection");
+
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         
         // poll events and swap buffers
         glfwPollEvents();
