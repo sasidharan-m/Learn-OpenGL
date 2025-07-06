@@ -1,6 +1,6 @@
 //
 //  main.cpp
-//  CoordinateSystemsExcercise3
+//  CameraMouseZoom
 //
 //  Created by  Sasidharan Mahalingam on 03/07/25.
 //
@@ -10,16 +10,58 @@
 #include <GLFW/glfw3.h>
 #include "stb_image.h"
 #include "shader_loader.h"
+#include "camera.h"
 #include <unistd.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void processInput(GLFWwindow *window);
+
+bool firstMouse = true; // Global boolean for mouse controlled movement initialization
+
+float lastX =  800.0f / 2.0;
+float lastY =  600.0 / 2.0;
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+float deltaTime = 0.0f; // Time between current frame and last frame
+float lastFrame = 0.0f; // Time of last frame
+
+
 // framebuffer size function to resize the viewport everytime the use resizes the window
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+}
+
+// input function that gets called every time the mouse in moved
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+    lastX = xpos;
+    lastY = ypos;
+
+    camera.processMouseMovement(xoffset, yoffset);
+}
+
+// input function that gets called every time the scroll wheel is used
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    camera.processMouseScroll(static_cast<float>(yoffset));
 }
 
 // input function that gets triggered every time a input key is pressed
@@ -29,6 +71,15 @@ void processInput(GLFWwindow *window)
     {
         glfwSetWindowShouldClose(window, true);
     }
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.processKeyboard(Camera_Movement::forward, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.processKeyboard(Camera_Movement::backward, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.processKeyboard(Camera_Movement::left, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.processKeyboard(Camera_Movement::right, deltaTime);
 }
 
 int main(int argc, const char * argv[]) {
@@ -50,6 +101,12 @@ int main(int argc, const char * argv[]) {
     glfwMakeContextCurrent(window);
     // set up viewport size
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    //set the mouse movement and scroll wheel callback functions
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+
+    // tell GLFW to capture our mouse
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     
     // set up GLAD to manage OpenGL function pointers
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -64,7 +121,7 @@ int main(int argc, const char * argv[]) {
     // Getting homepath
     std::string homepath = getenv("HOME");
     // Setting current path
-    std::string currentpath = "/Documents/OpenGL/OpenGL-Programs/Part-1 Getting Started/Example Programs/6.3 CoordinateSystemsMultiple/";
+    std::string currentpath = "/Documents/OpenGL/OpenGL-Programs/Part-1 Getting Started/Example Programs/7.4 CameraClass/";
     // Setting the paths of vertex and fragment shaders
     std::string vsPath = homepath + currentpath + "textures.vs";
     std::string fsPath = homepath + currentpath + "textures.fs";
@@ -235,6 +292,11 @@ int main(int argc, const char * argv[]) {
     // start render loop
     while(!glfwWindowShouldClose(window))
     {
+        // per frame time calculation
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        
         // process any inputs
         processInput(window);
         
@@ -257,7 +319,7 @@ int main(int argc, const char * argv[]) {
         ourShader.use();
 
         // set the view and projection matrices
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        view = camera.getViewMatrix();
         projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
         for(unsigned int i = 0; i < 10; ++i)
@@ -268,11 +330,6 @@ int main(int argc, const char * argv[]) {
             float angle = 20.0f * i;
             
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            
-            if(i % 3 == 0)
-            {
-                model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-            }
             
             unsigned int modelLoc = glGetUniformLocation(ourShader.getProgramID(), "model");
             unsigned int viewLoc = glGetUniformLocation(ourShader.getProgramID(), "view");

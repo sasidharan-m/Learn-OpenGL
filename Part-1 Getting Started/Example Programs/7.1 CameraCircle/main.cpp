@@ -1,6 +1,6 @@
 //
 //  main.cpp
-//  CoordinateSystemsExcercise3
+//  CameraCircle
 //
 //  Created by  Sasidharan Mahalingam on 03/07/25.
 //
@@ -64,7 +64,7 @@ int main(int argc, const char * argv[]) {
     // Getting homepath
     std::string homepath = getenv("HOME");
     // Setting current path
-    std::string currentpath = "/Documents/OpenGL/OpenGL-Programs/Part-1 Getting Started/Example Programs/6.3 CoordinateSystemsMultiple/";
+    std::string currentpath = "/Documents/OpenGL/OpenGL-Programs/Part-1 Getting Started/Example Programs/7.1 CameraCircle/";
     // Setting the paths of vertex and fragment shaders
     std::string vsPath = homepath + currentpath + "textures.vs";
     std::string fsPath = homepath + currentpath + "textures.fs";
@@ -257,7 +257,10 @@ int main(int argc, const char * argv[]) {
         ourShader.use();
 
         // set the view and projection matrices
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        const float radius = 10.0f;
+        float camX = sin(glfwGetTime()) * radius;
+        float camZ = cos(glfwGetTime()) * radius;
+        view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
         projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
         for(unsigned int i = 0; i < 10; ++i)
@@ -268,11 +271,6 @@ int main(int argc, const char * argv[]) {
             float angle = 20.0f * i;
             
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            
-            if(i % 3 == 0)
-            {
-                model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-            }
             
             unsigned int modelLoc = glGetUniformLocation(ourShader.getProgramID(), "model");
             unsigned int viewLoc = glGetUniformLocation(ourShader.getProgramID(), "view");

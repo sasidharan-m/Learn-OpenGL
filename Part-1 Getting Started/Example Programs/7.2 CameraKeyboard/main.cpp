@@ -1,6 +1,6 @@
 //
 //  main.cpp
-//  CoordinateSystemsExcercise3
+//  CameraKeyboard
 //
 //  Created by  Sasidharan Mahalingam on 03/07/25.
 //
@@ -16,6 +16,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+float deltaTime = 0.0f; // Time between current frame and last frame
+float lastFrame = 0.0f; // Time of last frame
+
+// define variables that store the camera position, direction and up vector
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
 // framebuffer size function to resize the viewport everytime the use resizes the window
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -29,6 +37,17 @@ void processInput(GLFWwindow *window)
     {
         glfwSetWindowShouldClose(window, true);
     }
+    float cameraSpeed = 2.5f * deltaTime;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    cameraPos += cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    cameraPos -= cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) *
+    cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) *
+    cameraSpeed;
 }
 
 int main(int argc, const char * argv[]) {
@@ -64,7 +83,7 @@ int main(int argc, const char * argv[]) {
     // Getting homepath
     std::string homepath = getenv("HOME");
     // Setting current path
-    std::string currentpath = "/Documents/OpenGL/OpenGL-Programs/Part-1 Getting Started/Example Programs/6.3 CoordinateSystemsMultiple/";
+    std::string currentpath = "/Documents/OpenGL/OpenGL-Programs/Part-1 Getting Started/Example Programs/7.2 CameraKeyboard/";
     // Setting the paths of vertex and fragment shaders
     std::string vsPath = homepath + currentpath + "textures.vs";
     std::string fsPath = homepath + currentpath + "textures.fs";
@@ -235,6 +254,11 @@ int main(int argc, const char * argv[]) {
     // start render loop
     while(!glfwWindowShouldClose(window))
     {
+        // per frame time calculation
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        
         // process any inputs
         processInput(window);
         
@@ -257,7 +281,7 @@ int main(int argc, const char * argv[]) {
         ourShader.use();
 
         // set the view and projection matrices
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
         for(unsigned int i = 0; i < 10; ++i)
@@ -268,11 +292,6 @@ int main(int argc, const char * argv[]) {
             float angle = 20.0f * i;
             
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            
-            if(i % 3 == 0)
-            {
-                model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-            }
             
             unsigned int modelLoc = glGetUniformLocation(ourShader.getProgramID(), "model");
             unsigned int viewLoc = glGetUniformLocation(ourShader.getProgramID(), "view");

@@ -5,8 +5,8 @@
 //  Created by Sasidharan Mahalingam on 3/5/23.
 //
 
-#ifndef shader_loader_h
-#define shader_loader_h
+#ifndef SHADER_LOADER_H
+#define SHADER_LOADER_H
 #include "glad.h"
 #include <glm/glm.hpp>
 
