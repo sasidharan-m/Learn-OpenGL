@@ -158,6 +158,12 @@ class Camera
             if (zoom_fov > 45.0f)
                 zoom_fov = 45.0f;
         }
+
+        // member function that returns the camera position
+        glm::vec3 getPosition()
+        {
+            return position;
+        }
 };
 
 #endif
