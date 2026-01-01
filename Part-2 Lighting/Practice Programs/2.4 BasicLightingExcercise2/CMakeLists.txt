@@ -7,4 +7,9 @@ find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 
 add_executable(BasicLightingExcercise2 stb_image.cpp main.cpp)
+
+target_compile_features(BasicLightingExcercise2 PRIVATE cxx_std_20)
+target_compile_options(BasicLightingExcercise2 PRIVATE -stdlib=libc++)
+target_link_options(BasicLightingExcercise2 PRIVATE -stdlib=libc++)
+
 target_link_libraries(BasicLightingExcercise2 ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} glfw glad stb_image utils)

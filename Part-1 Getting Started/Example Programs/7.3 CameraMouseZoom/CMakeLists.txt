@@ -7,4 +7,9 @@ find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 
 add_executable(CameraMouseZoom stb_image.cpp main.cpp)
+
+target_compile_features(CameraMouseZoom PRIVATE cxx_std_20)
+target_compile_options(CameraMouseZoom PRIVATE -stdlib=libc++)
+target_link_options(CameraMouseZoom PRIVATE -stdlib=libc++)
+
 target_link_libraries(CameraMouseZoom ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} glfw glad stb_image utils)

@@ -12,6 +12,8 @@
 #include "shader_loader.h"
 #include "camera.h"
 #include <unistd.h>
+#include <source_location>
+#include <filesystem>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -122,15 +124,15 @@ int main(int argc, const char * argv[]) {
     // Enable depth testing
     glEnable(GL_DEPTH_TEST);
 
-    // Getting homepath
-    std::string homepath = getenv("HOME");
     // Setting current path
-    std::string currentpath = "/Documents/OpenGL/OpenGL-Programs/Part-2 Lighting/Example Programs/2.1 BasicLightingDiffuse/";
+    std::filesystem::path source_file(std::source_location::current().file_name());
+    std::string currentpath = source_file.parent_path();
+
     // Setting the paths of vertex and fragment shaders
-    std::string vsPath = homepath + currentpath + "basiclightingdiffuse.vs";
-    std::string fsPath = homepath + currentpath + "basiclightingdiffuse.fs";
-    std::string lightvsPath = homepath + currentpath + "light_basiclightingdiffuse.vs";
-    std::string lightfsPath = homepath + currentpath + "light_basiclightingdiffuse.fs";
+    std::string vsPath = currentpath + "/basiclightingdiffuse.vs";
+    std::string fsPath = currentpath + "/basiclightingdiffuse.fs";
+    std::string lightvsPath = currentpath + "/light_basiclightingdiffuse.vs";
+    std::string lightfsPath = currentpath + "/light_basiclightingdiffuse.fs";
     // build and compile the shader program
     Shader ourShader(vsPath.c_str(), fsPath.c_str());
     Shader lightingOurShader(lightvsPath.c_str(), lightfsPath.c_str());

@@ -11,6 +11,8 @@
 #include "stb_image.h"
 #include "shader_loader.h"
 #include <unistd.h>
+#include <source_location>
+#include <filesystem>
 
 // framebuffer size function to resize the viewport everytime the use resizes the window
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -53,13 +55,15 @@ int main(int argc, const char * argv[]) {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-    // Getting homepath
-    std::string homepath = getenv("HOME");
+    
     // Setting current path
-    std::string currentpath = "/Documents/OpenGL/OpenGL-Programs/Part-1 Getting Started/Example Programs/4.1 Textures/";
+    std::filesystem::path source_file(std::source_location::current().file_name());
+    std::string currentpath = source_file.parent_path();
+    std::string projectpath = source_file.parent_path().parent_path().parent_path().parent_path();
+
     // Setting the paths of vertex and fragment shaders
-    std::string vsPath = homepath + currentpath + "textures.vs";
-    std::string fsPath = homepath + currentpath + "textures.fs";
+    std::string vsPath = currentpath + "/textures.vs";
+    std::string fsPath = currentpath + "/textures.fs";
     // build and compile the shader program
     Shader ourShader(vsPath.c_str(), fsPath.c_str());
     
@@ -113,7 +117,7 @@ int main(int argc, const char * argv[]) {
     // load image, create texture and generate mipmaps
     int width, height, nrChannels;
     // Set the right img path
-    std::string texturePath = homepath + "/Documents/OpenGL/OpenGL-Programs/" + "resources/container.jpg";
+    std::string texturePath = projectpath + "/resources/container.jpg";
     unsigned char *data = stbi_load(texturePath.c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
